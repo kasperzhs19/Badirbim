@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Air Pollution — Our Silent Killer</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    @theme {
+      --color-dark-900: #0a0f0d;
+      --color-dark-800: #111916;
+      --color-dark-700: #1a2520;
+      --color-dark-600: #243330;
+      --color-accent: #34d399;
+      --color-accent-dim: #065f46;
+      --color-warning: #ef4444;
+      --color-warning-dim: #7f1d1d;
+      --color-muted: #9ca3af;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--color-dark-900);
+      color: #e5e7eb;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* ── Slide Container ── */
+    .slides-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: none;
+      z-index: 0;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      z-index: 10;
+    }
+
+    /* ── Entrance Animations ── */
+    .slide.active .anim-fade-up {
+      animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    .slide.active .anim-fade-up-d1 {
+      animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
+      opacity: 0;
+    }
+
+    .slide.active .anim-fade-up-d2 {
+      animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.3s forwards;
+      opacity: 0;
+    }
+
+    .slide.active .anim-fade-up-d3 {
+      animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.45s forwards;
+      opacity: 0;
+    }
+
+    .slide.active .anim-fade-up-d4 {
+      animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
+      opacity: 0;
+    }
+
+    .slide.active .anim-fade-up-d5 {
+      animation: fadeUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.75s forwards;
+      opacity: 0;
+    }
+
+    .slide.active .anim-scale-in {
+      animation: scaleIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+      opacity: 0;
+    }
+
+    .slide.active .anim-scale-in-d1 {
+      animation: scaleIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
+      opacity: 0;
+    }
+
+    .slide.active .anim-scale-in-d2 {
+      animation: scaleIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.6s forwards;
+      opacity: 0;
+    }
+
+    .slide.active .anim-blur-in {
+      animation: blurIn 1.2s ease forwards;
+    }
+
+    .slide.active .anim-blur-in-d1 {
+      animation: blurIn 1.2s ease 0.3s forwards;
+      opacity: 0;
+    }
+
+    .slide.active .anim-count {
+      animation: countPulse 2s ease-in-out 0.5s forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes blurIn {
+      from { opacity: 0; filter: blur(12px); }
+      to   { opacity: 1; filter: blur(0); }
+    }
+
+    @keyframes countPulse {
+      0%   { opacity: 0; transform: scale(0.5); }
+      50%  { opacity: 1; transform: scale(1.05); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-12px); }
+    }
+
+    @keyframes glow-pulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(52, 211, 153, 0.15); }
+      50%      { box-shadow: 0 0 40px rgba(52, 211, 153, 0.35); }
+    }
+
+    @keyframes particle-drift {
+      0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0.6; }
+      50%  { opacity: 0.3; }
+      100% { transform: translateY(-100vh) translateX(40px) scale(0.3); opacity: 0; }
+    }
+
+    /* ── Dot Indicators ── */
+    .dot-nav {
+      position: fixed;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 2px solid rgba(52, 211, 153, 0.5);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      position: relative;
+    }
+
+    .dot::after {
+      content: attr(data-label);
+      position: absolute;
+      right: 24px;
+      top: 50%;
+      transform: translateY(-50%);
+      white-space: nowrap;
+      font-size: 0.7rem;
+      color: #9ca3af;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .dot:hover::after {
+      opacity: 1;
+    }
+
+    .dot.active {
+      background: #34d399;
+      border-color: #34d399;
+      box-shadow: 0 0 12px rgba(52, 211, 153, 0.6);
+      transform: scale(1.3);
+    }
+
+    /* ── Arrow Navigation ── */
+    .arrow-nav {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .arrow-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(52, 211, 153, 0.3);
+      background: rgba(17, 25, 22, 0.7);
+      backdrop-filter: blur(8px);
+      color: #34d399;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .arrow-btn:hover {
+      background: rgba(52, 211, 153, 0.15);
+      border-color: #34d399;
+      transform: scale(1.1);
+    }
+
+    .arrow-btn:disabled {
+      opacity: 0.2;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .slide-counter {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem;
+      color: #9ca3af;
+      letter-spacing: 0.15em;
+      min-width: 50px;
+      text-align: center;
+    }
+
+    /* ── Particles Background ── */
+    .particles-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(52, 211, 153, 0.15);
+      animation: particle-drift linear infinite;
+    }
+
+    /* ── Slide-specific Styles ── */
+
+    /* Slide 1 - The Crisis */
+    .slide-crisis {
+      background: radial-gradient(ellipse at 30% 50%, rgba(6, 95, 70, 0.15) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 80%, rgba(127, 29, 29, 0.1) 0%, transparent 50%),
+                  var(--color-dark-900);
+    }
+
+    .slide-crisis .hero-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #e5e7eb 0%, #34d399 50%, #ef4444 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .slide-crisis .hero-subtitle {
+      font-size: clamp(1rem, 2vw, 1.4rem);
+      color: #9ca3af;
+      max-width: 540px;
+      line-height: 1.7;
+    }
+
+    .breathing-line {
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #34d399, transparent);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    /* Slide 2 - The Sources */
+    .slide-sources {
+      background: radial-gradient(ellipse at 50% 50%, rgba(6, 95, 70, 0.08) 0%, transparent 70%),
+                  var(--color-dark-900);
+    }
+
+    .source-card {
+      background: linear-gradient(145deg, rgba(26, 37, 32, 0.8), rgba(17, 25, 22, 0.6));
+      border: 1px solid rgba(52, 211, 153, 0.12);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      transition: all 0.4s ease;
+      backdrop-filter: blur(8px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .source-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #34d399, transparent);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .source-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(52, 211, 153, 0.35);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .source-card:hover::before {
+      opacity: 1;
+    }
+
+    .source-icon {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 1.5rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(52, 211, 153, 0.08);
+      border: 1px solid rgba(52, 211, 153, 0.2);
+    }
+
+    .source-icon svg {
+      width: 32px;
+      height: 32px;
+      stroke: #34d399;
+      fill: none;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Slide 3 - The Toll */
+    .slide-toll {
+      background: radial-gradient(ellipse at 50% 40%, rgba(127, 29, 29, 0.15) 0%, transparent 60%),
+                  radial-gradient(ellipse at 20% 80%, rgba(6, 95, 70, 0.08) 0%, transparent 50%),
+                  var(--color-dark-900);
+    }
+
+    .stat-number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(4rem, 12vw, 9rem);
+      font-weight: 700;
+      line-height: 1;
+      background: linear-gradient(180deg, #ef4444 0%, #f97316 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: clamp(1rem, 2vw, 1.3rem);
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+    }
+
+    .stat-detail {
+      font-size: 0.95rem;
+      color: rgba(156, 163, 175, 0.7);
+      max-width: 320px;
+      line-height: 1.6;
+    }
+
+    .stat-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: rgba(239, 68, 68, 0.15);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .stat-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #ef4444, #f97316);
+      width: 0;
+      transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1) 0.8s;
+    }
+
+    .slide.active .stat-bar-fill {
+      width: var(--bar-width);
+    }
+
+    /* Slide 4 - The Future */
+    .slide-future {
+      background: radial-gradient(ellipse at 50% 60%, rgba(6, 95, 70, 0.2) 0%, transparent 60%),
+                  var(--color-dark-900);
+    }
+
+    .solution-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(52, 211, 153, 0.08);
+    }
+
+    .solution-check {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(52, 211, 153, 0.12);
+      border: 1.5px solid rgba(52, 211, 153, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 40px;
+      border: none;
+      border-radius: 60px;
+      background: linear-gradient(135deg, #34d399, #065f46);
+      color: #0a0f0d;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      animation: glow-pulse 3s ease-in-out infinite;
+      text-decoration: none;
+    }
+
+    .cta-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 50px rgba(52, 211, 153, 0.4);
+    }
+
+    /* ── Progress Bar Top ── */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #34d399, #065f46);
+      z-index: 200;
+      transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .dot-nav { right: 12px; gap: 10px; }
+      .dot { width: 10px; height: 10px; }
+      .dot::after { display: none; }
+      .arrow-nav { bottom: 20px; gap: 16px; }
+      .arrow-btn { width: 40px; height: 40px; }
+      .source-card { padding: 1.5rem 1rem; }
+    }
+
+    /* Scrollbar hide */
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Progress Bar -->
+  <div class="progress-bar" id="progressBar" style="width: 25%;"></div>
+
+  <!-- Ambient Particles -->
+  <div class="particles-container" id="particles"></div>
+
+  <!-- Dot Navigation -->
+  <nav class="dot-nav" id="dotNav">
+    <button class="dot active" data-slide="0" data-label="The Crisis" aria-label="Go to slide 1"></button>
+    <button class="dot" data-slide="1" data-label="The Sources" aria-label="Go to slide 2"></button>
+    <button class="dot" data-slide="2" data-label="The Toll" aria-label="Go to slide 3"></button>
+    <button class="dot" data-slide="3" data-label="The Future" aria-label="Go to slide 4"></button>
+  </nav>
+
+  <!-- Arrow Navigation -->
+  <div class="arrow-nav">
+    <button class="arrow-btn" id="prevBtn" disabled aria-label="Previous slide">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <span class="slide-counter" id="slideCounter">01 / 04</span>
+    <button class="arrow-btn" id="nextBtn" aria-label="Next slide">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+    </button>
+  </div>
+
+  <!-- ==================== SLIDES ==================== -->
+  <main class="slides-wrapper" id="slidesWrapper">
+
+    <!-- ── SLIDE 1: The Crisis ── -->
+    <section class="slide slide-crisis active" data-index="0">
+      <div class="flex flex-col items-center text-center px-6 max-w-4xl mx-auto">
+        <p class="anim-fade-up text-xs tracking-[0.35em] uppercase text-accent-dim mb-6" style="color: #065f46;">Air Pollution · Global Crisis</p>
+        <div class="breathing-line anim-fade-up-d1 mb-8"></div>
+        <h1 class="hero-title anim-blur-in mb-6">OUR SILENT<br>KILLER</h1>
+        <p class="hero-subtitle anim-fade-up-d2 mt-4">
+          Every year, toxic air silently claims millions of lives worldwide. 
+          Invisible yet devastating — the air we breathe may be the greatest threat we face.
+        </p>
+        <div class="anim-fade-up-d3 mt-10 flex items-center gap-3" style="color: rgba(156,163,175,0.5);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          <span class="text-xs tracking-widest uppercase">Scroll or press ↓ to continue</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SLIDE 2: The Sources ── -->
+    <section class="slide slide-sources" data-index="1">
+      <div class="w-full max-w-5xl mx-auto px-6">
+        <div class="text-center mb-12">
+          <p class="anim-fade-up text-xs tracking-[0.35em] uppercase mb-4" style="color: #065f46;">Where It Comes From</p>
+          <h2 class="anim-fade-up-d1 text-3xl md:text-5xl font-bold tracking-tight" style="font-family: 'Space Grotesk', sans-serif;">THE SOURCES</h2>
+          <p class="anim-fade-up-d2 text-muted mt-3 max-w-lg mx-auto">Three pillars of modern life driving the pollution crisis.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          <!-- Industry -->
+          <div class="source-card anim-scale-in">
+            <div class="source-icon">
+              <svg viewBox="0 0 24 24"><path d="M2 20h20"/><path d="M5 20V8l5-3v15"/><path d="M10 20l4-10v10"/><path d="M14 20l4-6v6"/><path d="M9 11h1"/><path d="M9 14h1"/><path d="M14 14h1"/></svg>
+            </div>
+            <h3 class="text-lg font-bold mb-2" style="font-family: 'Space Grotesk', sans-serif;">Industry</h3>
+            <p class="text-sm" style="color: rgba(156,163,175,0.7); line-height: 1.6;">Factories and manufacturing plants release tons of particulate matter, VOCs, and toxic chemicals into the atmosphere every single day.</p>
+            <div class="mt-4 stat-bar"><div class="stat-bar-fill" style="--bar-width: 42%;"></div></div>
+            <p class="text-xs mt-2" style="color: #34d399;">42% of global emissions</p>
+          </div>
+          <!-- Transport -->
+          <div class="source-card anim-scale-in-d1">
+            <div class="source-icon">
+              <svg viewBox="0 0 24 24"><rect x="1" y="6" width="15" height="12" rx="1"/><path d="M16 10h4l3 4v4h-7V10z"/><circle cx="5.5" cy="18.5" r="2"/><circle cx="18.5" cy="18.5" r="2"/></svg>
+            </div>
+            <h3 class="text-lg font-bold mb-2" style="font-family: 'Space Grotesk', sans-serif;">Transport</h3>
+            <p class="text-sm" style="color: rgba(156,163,175,0.7); line-height: 1.6;">Over 1.4 billion cars worldwide burn fossil fuels, emitting CO₂, nitrogen oxides, and fine particles that penetrate deep into our lungs.</p>
+            <div class="mt-4 stat-bar"><div class="stat-bar-fill" style="--bar-width: 28%;"></div></div>
+            <p class="text-xs mt-2" style="color: #34d399;">28% of global emissions</p>
+          </div>
+          <!-- Energy -->
+          <div class="source-card anim-scale-in-d2">
+            <div class="source-icon">
+              <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <h3 class="text-lg font-bold mb-2" style="font-family: 'Space Grotesk', sans-serif;">Energy</h3>
+            <p class="text-sm" style="color: rgba(156,163,175,0.7); line-height: 1.6;">Coal, oil, and gas power plants remain the dominant energy source — churning out sulfur dioxide, heavy metals, and relentless carbon emissions.</p>
+            <div class="mt-4 stat-bar"><div class="stat-bar-fill" style="--bar-width: 30%;"></div></div>
+            <p class="text-xs mt-2" style="color: #34d399;">30% of global emissions</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SLIDE 3: The Toll ── -->
+    <section class="slide slide-toll" data-index="2">
+      <div class="w-full max-w-5xl mx-auto px-6">
+        <div class="text-center mb-10">
+          <p class="anim-fade-up text-xs tracking-[0.35em] uppercase mb-4" style="color: #7f1d1d;">The Human Cost</p>
+          <h2 class="anim-fade-up-d1 text-3xl md:text-5xl font-bold tracking-tight" style="font-family: 'Space Grotesk', sans-serif;">THE TOLL</h2>
+        </div>
+        <div class="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
+          <div class="text-center md:text-left">
+            <p class="anim-count stat-number" id="deathCount">7M</p>
+            <p class="anim-fade-up-d2 stat-label mt-2">Deaths Annually</p>
+            <p class="anim-fade-up-d3 stat-detail mt-4 mx-auto md:mx-0">Air pollution is responsible for 1 in 8 deaths worldwide. It kills more people than malaria, tuberculosis, and AIDS combined.</p>
+          </div>
+          <div class="w-full md:w-px h-px md:h-48 anim-fade-up-d2" style="background: linear-gradient(180deg, transparent, rgba(239,68,68,0.3), transparent);"></div>
+          <div class="grid grid-cols-2 gap-6">
+            <div class="anim-scale-in text-center">
+              <p class="text-3xl md:text-4xl font-bold" style="font-family: 'Space Grotesk', sans-serif; color: #f97316;">91%</p>
+              <p class="text-xs uppercase tracking-wider mt-1" style="color: rgba(156,163,175,0.6);">Breathe<br>polluted air</p>
+            </div>
+            <div class="anim-scale-in-d1 text-center">
+              <p class="text-3xl md:text-4xl font-bold" style="font-family: 'Space Grotesk', sans-serif; color: #f97316;">4.2M</p>
+              <p class="text-xs uppercase tracking-wider mt-1" style="color: rgba(156,163,175,0.6);">Outdoor<br>deaths/yr</p>
+            </div>
+            <div class="anim-scale-in text-center">
+              <p class="text-3xl md:text-4xl font-bold" style="font-family: 'Space Grotesk', sans-serif; color: #f97316;">3.8M</p>
+              <p class="text-xs uppercase tracking-wider mt-1" style="color: rgba(156,163,175,0.6);">Indoor<br>deaths/yr</p>
+            </div>
+            <div class="anim-scale-in-d1 text-center">
+              <p class="text-3xl md:text-4xl font-bold" style="font-family: 'Space Grotesk', sans-serif; color: #f97316;">$5T</p>
+              <p class="text-xs uppercase tracking-wider mt-1" style="color: rgba(156,163,175,0.6);">Annual<br>welfare loss</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SLIDE 4: The Future ── -->
+    <section class="slide slide-future" data-index="3">
+      <div class="w-full max-w-4xl mx-auto px-6 text-center">
+        <p class="anim-fade-up text-xs tracking-[0.35em] uppercase mb-4" style="color: #065f46;">What We Can Do</p>
+        <h2 class="anim-fade-up-d1 text-3xl md:text-5xl font-bold tracking-tight mb-4" style="font-family: 'Space Grotesk', sans-serif;">THE FUTURE</h2>
+        <p class="anim-fade-up-d2 text-muted max-w-lg mx-auto mb-10">The solutions exist. All we need is the collective will to act.</p>
+        <div class="max-w-md mx-auto text-left mb-10">
+          <div class="solution-item anim-fade-up-d2">
+            <div class="solution-check">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <p class="font-semibold text-sm">Transition to Renewable Energy</p>
+              <p class="text-xs mt-1" style="color: rgba(156,163,175,0.6);">Solar, wind, and hydro can power the world cleanly.</p>
+            </div>
+          </div>
+          <div class="solution-item anim-fade-up-d3">
+            <div class="solution-check">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <p class="font-semibold text-sm">Electrify Transportation</p>
+              <p class="text-xs mt-1" style="color: rgba(156,163,175,0.6);">EVs, public transit, and cycling infrastructure are the future.</p>
+            </div>
+          </div>
+          <div class="solution-item anim-fade-up-d4">
+            <div class="solution-check">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <p class="font-semibold text-sm">Strengthen Environmental Policy</p>
+              <p class="text-xs mt-1" style="color: rgba(156,163,175,0.6);">Hold polluters accountable with stricter regulations and carbon pricing.</p>
+            </div>
+          </div>
+          <div class="solution-item anim-fade-up-d5">
+            <div class="solution-check">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <p class="font-semibold text-sm">Reforest & Protect Ecosystems</p>
+              <p class="text-xs mt-1" style="color: rgba(156,163,175,0.6);">Nature-based solutions absorb carbon and filter pollutants naturally.</p>
+            </div>
+          </div>
+        </div>
+        <div class="anim-scale-in">
+          <button class="cta-button" id="ctaBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 12l3 3 5-5"/></svg>
+            JOIN THE MOVEMENT
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- CTA Modal -->
+  <div id="ctaModal" class="fixed inset-0 z-[300] flex items-center justify-center bg-black/70 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-500">
+    <div class="bg-dark-800 border border-accent/20 rounded-2xl p-8 max-w-sm mx-4 text-center transform scale-90 transition-all duration-500" id="ctaModalContent">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/10 border border-accent/30 flex items-center justify-center">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 12l3 3 5-5"/></svg>
+      </div>
+      <h3 class="text-xl font-bold mb-2" style="font-family: 'Space Grotesk', sans-serif;">Welcome aboard.</h3>
+      <p class="text-sm text-muted mb-6">You've taken the first step. Together, we can clear the air for future generations.</p>
+      <button id="ctaClose" class="px-6 py-2 rounded-full border border-accent/30 text-accent text-sm font-semibold hover:bg-accent/10 transition cursor-pointer">Close</button>
+    </div>
+  </div>
+
+  <script>
+    // ── Particles ──
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = Math.random() * 4 + 2;
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.left = Math.random() * 100 + '%';
+      p.style.top = Math.random() * 100 + '%';
+      p.style.animationDuration = (Math.random() * 15 + 10) + 's';
+      p.style.animationDelay = (Math.random() * 10) + 's';
+      particlesContainer.appendChild(p);
+    }
+
+    // ── Slide Logic ──
+    let currentSlide = 0;
+    const totalSlides = 4;
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const slideCounter = document.getElementById('slideCounter');
+    const progressBar = document.getElementById('progressBar');
+    let isTransitioning = false;
+
+    function goToSlide(index, direction) {
+      if (isTransitioning || index === currentSlide || index < 0 || index >= totalSlides) return;
+      isTransitioning = true;
+
+      const current = slides[currentSlide];
+      const next = slides[index];
+
+      // Remove active from current
+      current.style.transition = 'opacity 0.6s ease';
+      current.style.opacity = '0';
+
+      setTimeout(() => {
+        current.classList.remove('active');
+        current.style.transition = 'none';
+        current.style.opacity = '';
+
+        // Reset animations on the old slide
+        current.querySelectorAll('[class*="anim-"]').forEach(el => {
+          el.style.animation = 'none';
+          el.offsetHeight; // trigger reflow
+          el.style.animation = '';
+        });
+
+        // Set next slide active
+        next.classList.add('active');
+
+        // Update state
+        currentSlide = index;
+        updateNav();
+        
+        setTimeout(() => {
+          isTransitioning = false;
+        }, 900);
+      }, 600);
+    }
+
+    function updateNav() {
+      // Dots
+      dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+
+      // Arrows
+      prevBtn.disabled = currentSlide === 0;
+      nextBtn.disabled = currentSlide === totalSlides - 1;
+
+      // Counter
+      const num = String(currentSlide + 1).padStart(2, '0');
+      slideCounter.textContent = `${num} / ${String(totalSlides).padStart(2, '0')}`;
+
+      // Progress bar
+      const pct = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+    }
+
+    // Dot clicks
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        goToSlide(parseInt(dot.dataset.slide));
+      });
+    });
+
+    // Arrow clicks
+    prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
+    nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
+
+    // Keyboard
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+        e.preventDefault();
+        goToSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        goToSlide(currentSlide - 1);
+      }
+    });
+
+    // Mouse wheel
+    let wheelTimeout = false;
+    document.addEventListener('wheel', (e) => {
+      if (wheelTimeout) return;
+      wheelTimeout = true;
+      setTimeout(() => wheelTimeout = false, 1200);
+      if (e.deltaY > 0) goToSlide(currentSlide + 1);
+      else goToSlide(currentSlide - 1);
+    }, { passive: true });
+
+    // Touch swipe
+    let touchStartY = 0;
+    document.addEventListener('touchstart', (e) => {
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    document.addEventListener('touchend', (e) => {
+      const diff = touchStartY - e.changedTouches[0].clientY;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) goToSlide(currentSlide + 1);
+        else goToSlide(currentSlide - 1);
+      }
+    }, { passive: true });
+
+    // CTA Modal
+    const ctaModal = document.getElementById('ctaModal');
+    const ctaModalContent = document.getElementById('ctaModalContent');
+    document.getElementById('ctaBtn').addEventListener('click', () => {
+      ctaModal.style.opacity = '1';
+      ctaModal.style.pointerEvents = 'auto';
+      ctaModalContent.style.transform = 'scale(1)';
+    });
+
+    function closeModal() {
+      ctaModal.style.opacity = '0';
+      ctaModal.style.pointerEvents = 'none';
+      ctaModalContent.style.transform = 'scale(0.9)';
+    }
+
+    document.getElementById('ctaClose').addEventListener('click', closeModal);
+    ctaModal.addEventListener('click', (e) => {
+      if (e.target === ctaModal) closeModal();
+    });
+
+    // Initialize
+    updateNav();
+  </script>
+</body>
+</html>
